@@ -1,0 +1,71 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backup directories
+backups/
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Data (raw data only, keep processed results)
+data/raw/*.csv
+data/raw/*.xlsx
+
+# Model files (optional - comment out if you want to keep them)
+# models/*.joblib
+# models/*.pkl
+
+# Generated reports (optional - uncomment to exclude)
+# *.png
+# *.jpg
+# *.pdf
+
+# Environment files
+.env
+.env.local

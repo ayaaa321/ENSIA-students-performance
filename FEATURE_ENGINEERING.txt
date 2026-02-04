@@ -1,0 +1,535 @@
+================================================================================
+                     FEATURE ENGINEERING DOCUMENTATION
+                    ENSIA Student Performance Regression Model
+================================================================================
+Date: February 2, 2026
+Project: Student Performance Prediction (1Y, 2Y, 3Y cohorts)
+Model Type: Pooled Ridge Regression + Random Forest Ensemble
+
+================================================================================
+[1] TARGET VARIABLE (WHAT WE PREDICT)
+================================================================================
+
+Column Name:       1y_average / 2y_average / 3y_average
+Meaning:           Average performance score across all modules in that year
+Data Type:         Continuous numeric
+Value Range:       Approximately 10–16 (university grading scale)
+Sample Size:       1Y: 210 total (147 train, 31 val, 32 test)
+                   2Y: 101 total (70 train, 15 val, 16 test)
+                   3Y: 10 total (8 train, 2 val, 2 test)
+
+Note: The target is cohort-specific (each year has its own average column).
+
+
+================================================================================
+[2] INPUT FEATURES (31 TOTAL AFTER ENCODING)
+================================================================================
+
+All features come from student survey responses and background information.
+
+BREAKDOWN BY ENCODING METHOD:
+   - 20 One-Hot Encoded Categorical Features
+   - 8 Numeric Features (mean-imputed + standardized)
+   - 3 Frequency-Encoded High-Cardinality Categorical Features
+
+
+2.A ONE-HOT ENCODED CATEGORICAL FEATURES (20 features)
+========================================================
+
+These categorical columns have ≤10 unique values. Each unique category becomes
+a binary column (1=present, 0=absent).
+
+ 1. what_is_your_gender
+    Values: Male, Female, Other
+    Reason: Low cardinality; must not imply ordering
+
+ 2. in_which_year_of_your_studies_are_you_cu
+    Values: 1st year, 2nd year, 3rd year
+    Reason: Year indicator (despite ordinal nature, encoded as one-hot)
+
+ 3. what_was_your_bac_specialty
+    Values: Science, Technology, Math, Literature, Other
+    Reason: Student background/prior education type
+
+ 4. how_many_hours_per_week_do_you_spend_stu
+    Values: <10 hours, 10-20, 20-30, 30-40, >40 hours (binned)
+    Reason: Study time allocation (binned to reduce cardinality)
+
+ 5. where_do_you_prefer_to_study
+    Values: Home, Library, Café, University, Shared space
+    Reason: Study location preference
+
+ 6. you_prefer_to_study
+    Values: Alone, With friends, With study group, Mixed
+    Reason: Study environment preference
+
+ 7. do_you_use_a_planer_or_a_schedule_in_you
+    Values: Yes, No, Sometimes
+    Reason: Study organization/planning habits
+
+ 8. for_the_next_8_questions_you_will_have_a
+    Values: Various survey section markers
+    Reason: Survey structure indicator
+
+ 9-16. 2_second, 3_third, 4_fourth, 5_fifth, 6_sixth, 7_seventh, 8_eighth
+       (8 Likert-scale question responses)
+    Values: Strongly disagree (1) to Strongly agree (8)
+    Reason: Respondent agreements on various statements (e.g., motivation,
+           stress, teaching quality, etc.)
+
+17. do_you_engage_in_any_external_activities
+    Values: Yes, No, Sometimes
+    Reason: Extracurricular involvement indicator
+
+18. how_do_other_s_feedback_influence_you
+    Values: Positively, Negatively, Mixed, Not at all
+    Reason: Sensitivity to peer/external feedback
+
+19. how_many_hours_do_you_sleep
+    Values: <6h, 6-7h, 7-8h, 8-9h, >9h (binned)
+    Reason: Sleep duration (health/wellness proxy)
+
+20. how_do_others_feedbacks_influence_you
+    Values: Positively, Negatively, Neutrally, Variably
+    Reason: Feedback receptiveness (variant column name of #18)
+
+
+2.B NUMERIC FEATURES (8 features, SCALED)
+==========================================
+
+These are continuous Likert-scale or numeric response columns.
+
+Preprocessing: Mean imputation (replace NaN with column mean) → StandardScale
+
+ 1. rate_your_satisfaction_with_the_school_s
+    Original Range: 1–10 (low to high satisfaction)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Student satisfaction with school environment
+
+ 2. your_level_of_motivation_for_joining_ens
+    Original Range: 1–10 (low to high motivation)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Intrinsic motivation for studies
+
+ 3. how_much_do_you_like_the_field_of_artifi
+    Original Range: 1–10 (dislike to like)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Interest in AI/field of study
+
+ 4. how_well_do_you_handle_stress_and_pressu
+    Original Range: 1–10 (poorly to well)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Stress management capability
+
+ 5. in_a_scale_of_1_to_10_how_do_you_rate_yo
+    Original Range: 1–10 (low to high)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Self-rated academic capability
+
+ 6. 2_programming
+    Original Range: numeric rating (e.g., 1–10 or 1–5)
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Self-reported programming skill level
+
+ 7. 3_computer_science
+    Original Range: numeric rating
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Self-reported computer science knowledge
+
+ 8. 4_mathematics
+    Original Range: numeric rating
+    After Scaling: mean ≈ 0, std ≈ 1
+    Meaning: Self-reported mathematics proficiency
+
+
+2.C FREQUENCY-ENCODED CATEGORICAL FEATURES (3 features)
+========================================================
+
+These have many unique values (40–60+). Frequency encoding maps each unique
+category to its proportion (frequency) in the training data.
+
+Encoding Formula: value → (count of value) / (total samples)
+Result: Each unique category → number between 0.0 and 1.0
+
+ 1. what_learning_methods_do_help_you_unders
+    Cardinality: 62 unique learning method combinations
+    Examples:
+      "Learning by practicing" → 0.0681
+      "Online courses and tutorials" → 0.0402
+      "Lectures; Learning by practicing; Online courses" → 0.0402
+      ... (59 more combinations)
+    Meaning: Mapping of student's preferred learning approaches to prevalence
+
+ 2. what_types_of_resources_do_you_use_most
+    Cardinality: 44 unique resource types
+    Examples:
+      "YouTube videos" → 0.0805
+      "Online tutorials; YouTube videos" → 0.0805
+      "Books, Online tutorials, Online documents, YouTube videos" → 0.0681
+      ... (41 more combinations)
+    Meaning: Mapping of study resource preferences to prevalence
+
+ 3. other_problems_that_you_face
+    Cardinality: 33 unique problem descriptions
+    Examples:
+      "Lack of motivation" → 0.4582
+      [Text describing various challenges] → 0.3158
+      "Not organized study schedule" → 0.0898
+      ... (30 more problem statements)
+    Meaning: Mapping of student challenges to prevalence
+
+
+================================================================================
+[3] COLUMNS REMOVED (WHY & HOW MANY)
+================================================================================
+
+Total original columns in raw data: ~80+ (varies by cohort)
+Removed for leakage: ~15–20 columns
+Removed for redundancy: ~10–15 columns
+Kept for modeling: 31 features (after encoding) + 1 target + ID columns
+
+
+3.A LEAKAGE REMOVAL
+====================
+
+Leakage: Using information that would not be available at prediction time.
+
+Dropped ALL average/mean/avg columns EXCEPT the target:
+   - Dropped: 1y_all_modules_avg, 1y_programming_average, 1y_math_average, etc.
+   - Dropped: 2y_average, 3y_average (when predicting for 1Y; kept only target)
+   - Reason: These are derived from the same grades we're trying to predict;
+             using them would be "cheating" (data leakage)
+
+
+3.B REDUNDANCY REMOVAL
+=======================
+
+Dropped COUNT columns (*_n suffix):
+   - Dropped: 1y_programming_n, 1y_math_n, 1y_other_n, 1y_all_modules_n
+   - Dropped: 2y_programming_n, 2y_math_n, 2y_other_n, 2y_all_modules_n
+   - Dropped: 3y_programming_n, 3y_math_n, 3y_other_n, 3y_all_modules_n
+   - Reason: These are just counts of how many questions in each category;
+             not meaningful predictive features
+
+Dropped ID/Administrative columns:
+   - Dropped: record_id, student_id (not predictive)
+   - Dropped: year_ordinal (redundant with year column)
+   - Dropped: inferred_year_from_grades (derived, redundant)
+   - Reason: These don't help predict performance; would cause leakage if used
+
+
+================================================================================
+[4] FEATURE TRANSFORMATION PIPELINE
+================================================================================
+
+All data passes through a unified preprocessing pipeline fitted on concatenated
+training data from ALL cohorts (1Y, 2Y, 3Y).
+
+STEP-BY-STEP TRANSFORMATION:
+============================
+
+Step 1: COLUMN NAME STANDARDIZATION
+   Input:  "What's your level of motivation for joining ENSIA?"
+   Process: 1. Lowercase
+            2. Replace special chars with underscore
+            3. Truncate to max 40 characters if too long
+   Output: "what_s_your_level_of_motivation_for_jo"
+
+
+Step 2: LEAKAGE & REDUNDANCY FILTERING
+   Process: Drop all columns flagged as leakage or redundant (see section 3)
+   Effect: Reduces feature count from ~80 → ~35 raw features
+
+
+Step 3: FREQUENCY ENCODING (High-cardinality categorical, >10 unique values)
+   Columns affected: 3 columns
+   Process:
+      1. Count frequency of each unique value in training data
+      2. Create value → frequency mapping (normalize to 0–1 range)
+      3. Replace text value with its frequency score
+   
+   Example:
+      Original: "Learning by practicing"
+      Frequency map: {"Learning by practicing": 0.068, "Online courses": 0.040, ...}
+      Encoded value: 0.068
+      
+   Why: Reduces dimensionality (1 column per feature, not 50+ one-hot columns).
+        Captures category prevalence (more common responses get higher weight).
+
+
+Step 4: ONE-HOT ENCODING (Low-cardinality categorical, ≤10 unique values)
+   Columns affected: 20 columns
+   Process:
+      1. Identify all unique values in training data
+      2. Create one binary column per unique value
+      3. Set to 1 if value matches, 0 otherwise
+   
+   Example (gender, 3 unique values):
+      Original values: "Male", "Female", "Other"
+      After encoding:
+         gender_male: [1, 0, 0]
+         gender_female: [0, 1, 0]
+         gender_other: [0, 0, 1]
+      
+   Why: Prevents artificial ordering (Male=1 < Female=2 implies ordering).
+        Allows model to learn independent effect of each category.
+
+
+Step 5: NUMERIC IMPUTATION
+   Columns affected: 8 numeric columns
+   Process: For each missing value (NaN), fill with column mean
+   
+   Example:
+      Before: [5.0, NaN, 8.0, 3.0, NaN]
+      Mean: (5+8+3)/3 = 5.33
+      After: [5.0, 5.33, 8.0, 3.0, 5.33]
+      
+   Why: Preserves sample count. Uses reasonable default (average behavior).
+
+
+Step 6: NUMERIC STANDARDIZATION (StandardScaler)
+   Columns affected: All numeric columns (8 original + 8 from one-hot encoding)
+   Process: z = (x - mean) / std
+   
+   Example (motivation, originally 1–10):
+      Original values: [5, 7, 8, 3, 6]
+      Mean: 5.8, Std: 1.64
+      Standardized: 
+         5 → (5-5.8)/1.64 = -0.49
+         7 → (7-5.8)/1.64 = 0.73
+         8 → (8-5.8)/1.64 = 1.34
+         3 → (3-5.8)/1.64 = -1.71
+         6 → (6-5.8)/1.64 = 0.12
+      
+   After transformation: mean ≈ 0.0, std ≈ 1.0
+   
+   Why: All features on same scale. Prevents features with larger ranges
+        (e.g., study hours: 0–50) from dominating features with smaller ranges
+        (e.g., satisfaction: 1–10). Ridge/RandomForest benefit from scaling.
+
+
+Step 7: ID COLUMN REMOVAL
+   Process: Drop all ID-like columns (student_id, record_id, etc.)
+   Why: IDs are not predictive; would cause data leakage if model learns
+        to memorize student IDs.
+
+
+FINAL OUTPUT:
+=============
+Shape: (n_samples, 31 features)
+Data type: All numeric (0/1 for one-hot, 0–1 for frequency, ≈[-3, +3] for scaled)
+Each row: A single student's preprocessed features
+Each column: A single numeric feature ready for model input
+
+
+================================================================================
+[5] UNIFIED PREPROCESSOR (KEY ARCHITECTURAL DECISION)
+================================================================================
+
+PROBLEM: Train/test on 1Y, 2Y, 3Y cohorts separately → different scalings,
+         different one-hot categories, unfair comparison.
+
+SOLUTION: Fit preprocessor ONCE on all training data concatenated.
+
+PROCESS:
+1. Concatenate train sets from 1Y, 2Y, 3Y (225 samples total)
+2. Fit frequency encoder on concatenated data → 1 frequency map
+3. Fit one-hot encoder on concatenated data → consistent categories
+4. Fit standard scaler on concatenated data → 1 mean & std per feature
+5. Save preprocessor + frequency maps + fit_columns metadata
+6. Apply SAME preprocessing to each cohort's test set
+
+BENEFIT:
+   ✓ Fair comparison: all cohorts use identical feature scales
+   ✓ Stable encoding: categories seen in training are consistently encoded
+   ✓ Reproducible: can load saved preprocessor for future predictions
+
+
+================================================================================
+[6] WHY EACH ENCODING METHOD
+================================================================================
+
+PROBLEM: Raw survey responses are mixed types (text, numeric, categories).
+         Models expect numeric input; features at different scales conflict.
+
+SOLUTION: Encoding strategy tailored to each data type.
+
+
+FREQUENCY ENCODING (high-cardinality categorical):
+   Problem: 50+ unique values → one-hot would create 50+ sparse columns
+   Solution: Map each value to its frequency (0.0–1.0)
+   Trade-off: Loses category identity but preserves prevalence signal
+   When: >10 unique values
+   Examples in data: Learning methods (62 types), resources (44 types),
+                     problems (33 types)
+
+
+ONE-HOT ENCODING (low-cardinality categorical):
+   Problem: Gender [Male=1, Female=2, Other=3] implies Male < Female < Other
+   Solution: Create binary columns (no artificial ordering)
+   Trade-off: Increases dimensionality but preserves category independence
+   When: ≤10 unique values
+   Examples in data: Gender (3), year (3), study location (5), etc.
+
+
+STANDARDIZATION (numeric):
+   Problem: Different scales (motivation: 1–10 vs. study hours: 0–50)
+            Ridge regularization penalizes large weights; needs fair scale
+   Solution: z = (x - mean) / std → all features mean=0, std=1
+   Trade-off: Loses interpretability (units) but improves model stability
+   When: All numeric features
+   Examples in data: Motivation, satisfaction, stress, skills, etc.
+
+
+MEAN IMPUTATION (missing values):
+   Problem: Incomplete survey responses
+   Solution: Fill missing with column mean (default to average behavior)
+   Trade-off: Introduces bias (assumes missing ≈ average) but preserves n
+   When: Any missing numeric value
+   Result: No samples dropped; maximum training data used
+
+
+================================================================================
+[7] FINAL MODEL INPUT FORMAT
+================================================================================
+
+After preprocessing, model receives:
+
+INPUT DIMENSION:
+   31 numeric features (scaled to 0/1 or mean=0, std=1 range)
+
+INPUT EXAMPLE (one student):
+   [-0.49, 0.0, 1.0, 0.068, 0.805, 0.0, 0.0, 0.73, 1.34, ...]
+   ^      ^    ^    ^      ^     ^    ^    ^    ^
+   |      |    |    |      |     |    |    |    |
+   scaled moti- one-hot freq  freq  one- one- scale scaled
+   motivation hot gender learn  resou hot  hot  d     stress
+               (M)      methods urces
+
+OUTPUT:
+   Continuous prediction: 10.5 (student's predicted average grade)
+   Range: ~10–16 (realistic grade scale)
+
+
+================================================================================
+[8] MODEL ARCHITECTURE
+================================================================================
+
+FINAL MODELS:
+   - Pooled Linear Regression (baseline)
+   - Pooled Ridge Regression (tuned, α=10.0)
+   - Pooled Random Forest (tuned, n_estimators=100, max_depth=10, ...)
+
+TRAINING DATA:
+   Pooled from all cohorts: 225 samples
+   Features: 31 (after encoding)
+   Classes: 3 cohorts (1Y, 2Y, 3Y) represented in pool
+
+EVALUATION:
+   Per-cohort test sets (keep cohorts separate at test time):
+   - 1Y test: 32 samples
+   - 2Y test: 16 samples
+   - 3Y test: 2 samples (too small to be reliable)
+
+
+================================================================================
+[9] SUMMARY TABLE: FROM RAW TO ENCODED
+================================================================================
+
+Raw Feature Type            Count  Encoding         Output Count  Output Range
+─────────────────────────────────────────────────────────────────────────────
+Numeric continuous          8      StandardScale    8             [-3, +3]
+Categorical (low card.)     20     OneHotEncode     20            {0, 1}
+Categorical (high card.)    3      FrequencyEncode  3             [0.0, 1.0]
+ID-like                     1      DROP             0             (removed)
+Leakage (averages)          ~15    DROP             0             (removed)
+Redundancy (*_n, year)      ~10    DROP             0             (removed)
+─────────────────────────────────────────────────────────────────────────────
+TOTAL RAW COLUMNS:          ~80
+TOTAL ENCODED FEATURES:     31
+
+
+================================================================================
+[10] REPRODUCIBILITY & PERSISTENCE
+================================================================================
+
+SAVED ARTIFACTS:
+   File: models/preprocessor_1y.joblib (also 2y, 3y with same content)
+   
+   Contains:
+      - 'preprocessor': scikit-learn ColumnTransformer (fitted)
+      - 'freq_maps': dictionary of category → frequency mappings (3 columns)
+      - 'freq_cols': list of frequency-encoded column names
+      - 'fit_columns': list of 31 transformed feature names (in order)
+      - 'id_like': list of ID-like columns (for dropping at inference)
+      - 'target_column': name of target column (e.g., '1y_average')
+
+USAGE AT INFERENCE:
+   1. Load saved preprocessor joblib
+   2. Read new student data (same raw columns as training)
+   3. Apply frequency maps (replace text with frequency score)
+   4. Drop ID columns using 'id_like' list
+   5. One-hot encode using fitted encoder
+   6. Standardscale using fitted mean/std
+   7. Align to 'fit_columns' order (critical!)
+   8. Pass 31-dim vector to trained model → prediction
+
+
+================================================================================
+[11] KEY INSIGHTS & DECISIONS
+================================================================================
+
+WHY UNIFIED PREPROCESSING?
+   Different scaling across cohorts would make comparisons unfair.
+   By fitting once on all data, all cohorts use same scale/encoding.
+
+WHY FREQUENCY ENCODING FOR 3 COLUMNS?
+   62 unique learning methods → one-hot would create 62 sparse columns.
+   Frequency encoding reduces to 1 column, captures category prevalence.
+
+WHY NO EXPLICIT NUMERIC FEATURES IN fit_columns?
+   The numeric columns (8) are part of one-hot transformation output.
+   They are scaled by StandardScaler; their names appear in fit_columns
+   (e.g., 'rate_your_satisfaction_with_the_school_s').
+
+WHY DROP *_n COLUMNS?
+   These are just counts of responses per category.
+   Not meaningful for prediction (e.g., "how many programming modules" is
+   redundant with program structure, not student-specific behavior).
+
+WHY POOLED TRAINING?
+   Cohorts 2Y and 3Y have very few samples (70, 8 total).
+   Pooling (225 samples) improves model stability and avoids overfitting.
+   Fair comparison: same training signal across cohorts at test time.
+
+
+================================================================================
+[12] LIMITATIONS & FUTURE IMPROVEMENTS
+================================================================================
+
+CURRENT LIMITATIONS:
+   1. Survey data may have response bias (students may not answer truthfully)
+   2. Small cohort sizes (especially 3Y: n=10) make metrics unreliable
+   3. Frequency encoding loses category identity (no interpretability)
+   4. Feature engineering assumes survey questions are valid proxies for
+      performance (unclear causal relationship)
+
+POTENTIAL IMPROVEMENTS:
+   1. Add external features: prior GPA, attendance, module-specific grades
+   2. Use SHAP or permutation importance to identify most predictive features
+   3. Implement k-fold cross-validation for more robust metric estimation
+   4. Explore interaction terms (e.g., motivation × study hours)
+   5. Investigate label noise (validate target values)
+   6. Re-save preprocessor in current scikit-learn version (avoid version warnings)
+
+
+================================================================================
+END OF DOCUMENT
+================================================================================
+
+For questions about features, encoding, or model predictions, refer to:
+   - Preprocessor joblib: models/preprocessor_1y.joblib
+   - Predictions CSV: data/outputs/predictions/renamed/predictions_*_test.csv
+   - Feature names list: inspect_features.py (run this script to list all features)
+
+Generated: February 2, 2026

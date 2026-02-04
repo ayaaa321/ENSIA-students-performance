@@ -1,0 +1,299 @@
+{
+  "1Y": {
+    "target": "1y average s1",
+    "summary": {
+      "shape": [
+        210,
+        45
+      ],
+      "dtypes": {
+        "object": 23,
+        "float64": 16,
+        "int64": 6
+      },
+      "long_names": [
+        "in which year of your studies are you currently enrolled",
+        "how many hours per week do you spend studying personnal efforts",
+        "what learning methods do help you understand better",
+        "what types of resources do you use most",
+        "do you use a planer or a schedule in your revisions",
+        "for the next 8 questions you will have a list of problems obstacles classify them according to how much they influence your studies 1 first",
+        "rate your satisfaction with the school s program",
+        "do you engage in any external activities not related to the study field",
+        "your level of motivation for joining ensia",
+        "how much do you like the field of artificial intelligence",
+        "how do other s feedback influence you",
+        "how well do you handle stress and pressure",
+        "in a scale of 1 to 10 how do you rate your level in the following fields 1 english",
+        "how do others feedbacks influence you"
+      ],
+      "high_missing": {},
+      "cat_candidates_sample": [
+        [
+          "what is your gender",
+          2,
+          "object"
+        ],
+        [
+          "in which year of your studies are you currently enrolled",
+          4,
+          "object"
+        ],
+        [
+          "what was your bac specialty",
+          3,
+          "object"
+        ],
+        [
+          "how many hours per week do you spend studying personnal efforts",
+          6,
+          "object"
+        ],
+        [
+          "where do you prefer to study",
+          4,
+          "object"
+        ],
+        [
+          "you prefer to study",
+          3,
+          "object"
+        ],
+        [
+          "what learning methods do help you understand better",
+          58,
+          "object"
+        ],
+        [
+          "what types of resources do you use most",
+          41,
+          "object"
+        ],
+        [
+          "do you use a planer or a schedule in your revisions",
+          2,
+          "object"
+        ],
+        [
+          "for the next 8 questions you will have a list of problems obstacles classify them according to how much they influence your studies 1 first",
+          7,
+          "object"
+        ]
+      ],
+      "numeric_cols_count": 22,
+      "numeric_high_cardinality": [
+        [
+          "record_id",
+          210
+        ]
+      ],
+      "id_like_columns": [
+        "record_id"
+      ]
+    },
+    "suggestions": [
+      "Use `1y average s1` as target variable.",
+      "Rename long column names to snake_case and shorten (>30 chars).",
+      "Drop or exclude ID-like columns from features (e.g., student id).",
+      "Encode categorical features: one-hot for low-cardinality, ordinal/target for ordered.",
+      "Scale numeric features (StandardScaler) when using regularized or distance-based models.",
+      "Review high-cardinality numeric columns (may be continuous features, keep as-is)."
+    ]
+  },
+  "2Y": {
+    "target": "2y average s1",
+    "summary": {
+      "shape": [
+        101,
+        45
+      ],
+      "dtypes": {
+        "object": 24,
+        "float64": 15,
+        "int64": 6
+      },
+      "long_names": [
+        "in which year of your studies are you currently enrolled",
+        "how many hours per week do you spend studying personnal efforts",
+        "what learning methods do help you understand better",
+        "what types of resources do you use most",
+        "do you use a planer or a schedule in your revisions",
+        "for the next 8 questions you will have a list of problems obstacles classify them according to how much they influence your studies 1 first",
+        "rate your satisfaction with the school s program",
+        "do you engage in any external activities not related to the study field",
+        "your level of motivation for joining ensia",
+        "how much do you like the field of artificial intelligence",
+        "how do other s feedback influence you",
+        "how well do you handle stress and pressure",
+        "in a scale of 1 to 10 how do you rate your level in the following fields 1 english",
+        "how do others feedbacks influence you"
+      ],
+      "high_missing": {},
+      "cat_candidates_sample": [
+        [
+          "what is your gender",
+          2,
+          "object"
+        ],
+        [
+          "in which year of your studies are you currently enrolled",
+          3,
+          "object"
+        ],
+        [
+          "what was your bac specialty",
+          3,
+          "object"
+        ],
+        [
+          "how many hours per week do you spend studying personnal efforts",
+          6,
+          "object"
+        ],
+        [
+          "where do you prefer to study",
+          3,
+          "object"
+        ],
+        [
+          "you prefer to study",
+          3,
+          "object"
+        ],
+        [
+          "what learning methods do help you understand better",
+          50,
+          "object"
+        ],
+        [
+          "what types of resources do you use most",
+          33,
+          "object"
+        ],
+        [
+          "do you use a planer or a schedule in your revisions",
+          2,
+          "object"
+        ],
+        [
+          "for the next 8 questions you will have a list of problems obstacles classify them according to how much they influence your studies 1 first",
+          8,
+          "object"
+        ]
+      ],
+      "numeric_cols_count": 21,
+      "numeric_high_cardinality": [
+        [
+          "record_id",
+          101
+        ]
+      ],
+      "id_like_columns": [
+        "record_id"
+      ]
+    },
+    "suggestions": [
+      "Use `2y average s1` as target variable.",
+      "Rename long column names to snake_case and shorten (>30 chars).",
+      "Drop or exclude ID-like columns from features (e.g., student id).",
+      "Encode categorical features: one-hot for low-cardinality, ordinal/target for ordered.",
+      "Scale numeric features (StandardScaler) when using regularized or distance-based models.",
+      "Review high-cardinality numeric columns (may be continuous features, keep as-is)."
+    ]
+  },
+  "3Y": {
+    "target": "3y average s1",
+    "summary": {
+      "shape": [
+        12,
+        45
+      ],
+      "dtypes": {
+        "object": 23,
+        "float64": 16,
+        "int64": 6
+      },
+      "long_names": [
+        "in which year of your studies are you currently enrolled",
+        "how many hours per week do you spend studying personnal efforts",
+        "what learning methods do help you understand better",
+        "what types of resources do you use most",
+        "do you use a planer or a schedule in your revisions",
+        "for the next 8 questions you will have a list of problems obstacles classify them according to how much they influence your studies 1 first",
+        "rate your satisfaction with the school s program",
+        "do you engage in any external activities not related to the study field",
+        "your level of motivation for joining ensia",
+        "how much do you like the field of artificial intelligence",
+        "how do other s feedback influence you",
+        "how well do you handle stress and pressure",
+        "in a scale of 1 to 10 how do you rate your level in the following fields 1 english",
+        "how do others feedbacks influence you"
+      ],
+      "high_missing": {},
+      "cat_candidates_sample": [
+        [
+          "record_id",
+          12,
+          "int64"
+        ],
+        [
+          "what is your gender",
+          2,
+          "object"
+        ],
+        [
+          "in which year of your studies are you currently enrolled",
+          2,
+          "object"
+        ],
+        [
+          "what was your bac specialty",
+          2,
+          "object"
+        ],
+        [
+          "how many hours per week do you spend studying personnal efforts",
+          3,
+          "object"
+        ],
+        [
+          "where do you prefer to study",
+          3,
+          "object"
+        ],
+        [
+          "you prefer to study",
+          2,
+          "object"
+        ],
+        [
+          "what learning methods do help you understand better",
+          11,
+          "object"
+        ],
+        [
+          "what types of resources do you use most",
+          9,
+          "object"
+        ],
+        [
+          "do you use a planer or a schedule in your revisions",
+          2,
+          "object"
+        ]
+      ],
+      "numeric_cols_count": 22,
+      "numeric_high_cardinality": [],
+      "id_like_columns": [
+        "record_id"
+      ]
+    },
+    "suggestions": [
+      "Use `3y average s1` as target variable.",
+      "Rename long column names to snake_case and shorten (>30 chars).",
+      "Drop or exclude ID-like columns from features (e.g., student id).",
+      "Encode categorical features: one-hot for low-cardinality, ordinal/target for ordered.",
+      "Scale numeric features (StandardScaler) when using regularized or distance-based models."
+    ]
+  }
+}
